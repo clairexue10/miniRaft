@@ -104,8 +104,6 @@ func getLogTerm(index int) int {
 }
 
 // The RequestVote RPC as defined in Raft
-// Hint 1: Use the description in Figure 2 of the paper
-// Hint 2: Only focus on the details related to leader election and majority votes
 func (*RaftNode) RequestVote(arguments VoteArguments, reply *VoteReply) error {
 	mu.Lock()
 	defer mu.Unlock()
@@ -150,8 +148,6 @@ func (*RaftNode) RequestVote(arguments VoteArguments, reply *VoteReply) error {
 }
 
 // The AppendEntry RPC as defined in Raft
-// Hint 1: Use the description in Figure 2 of the paper
-// Hint 2: Only focus on the details related to leader election and heartbeats
 func (*RaftNode) AppendEntry(arguments AppendEntryArgument, reply *AppendEntryReply) error {
 	mu.Lock()
 	defer mu.Unlock()
@@ -237,24 +233,6 @@ func applyEntries() {
 // This function is designed to emulate a client reaching out to the
 // server. Note that many of the realistic details are removed, for simplicity
 func ClientAddToLog() {
-	// In a realistic scenario, the client will find the leader node and communicate with it
-	// In this implementation, we are pretending that the client reached out to the server somehow
-	// But any new log entries will not be created unless the server node is a leader
-	// isLeader here is a boolean to indicate whether the node is a leader or not
-	//if role == Leader {
-	// lastAppliedIndex here is an int variable that is needed by a node
-	//to store the value of the last index it used in the log
-	//lastAppliedIndex := logs.LastLogIndex + 1
-	//entry := LogEntry{lastAppliedIndex, currentTerm}
-	//log.Println("Client communication created the new log entry at index " + strconv.Itoa(entry.Index))
-	// Add rest of logic here
-	// HINT 1: using the AppendEntry RPC might happen here
-	//}
-	// HINT 2: force the thread to sleep for a good amount of time (less
-	//than that of the leader election timer) and then repeat the actions above.
-	//You may use an endless loop here or recursively call the function
-	// HINT 3: you don’t need to add to the logic of creating new log
-	//entries, just handle the replication
 	for {
 		time.Sleep(8 * time.Second)
 
@@ -357,8 +335,7 @@ func replicateToFollowers(term int) {
 	}
 }
 
-// You may use this function to help with handling the election time out
-// Hint: It may be helpful to call this method every time the node wants to start an election
+// Handles leader election
 func LeaderElection() {
 	fmt.Println("LeaderElection is called.")
 	var wg sync.WaitGroup
@@ -444,8 +421,8 @@ func LeaderElection() {
 	}
 }
 
-// You may use this function to help with handling the periodic heartbeats
-// Hint: Use this only if the node is a leader
+// Handles the periodic heartbeats
+
 func Heartbeat(termWhenElected int) {
 	heartBeatTimer := time.NewTimer(heartbeatTime)
 	defer heartBeatTimer.Stop()
